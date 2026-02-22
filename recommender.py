@@ -4,16 +4,38 @@ import ast
 import re
 from collections import Counter
 
-# Connect to MongoDB Atlas
-db = get_database()
-collection = db["app"]
+from config import get_database
+import pandas as pd
+import ast
+import re
+from collections import Counter
+import streamlit as st
 
-# Load data into DataFrame
-data = list(collection.find({}, {"_id": 0}))
-df = pd.DataFrame(data)
+# Connect to MongoDB Atlas with error handling
+@st.cache_resource
+def load_data():
+    try:
+        db = get_database()
+        collection = db["app"]
+        data = list(collection.find({}, {"_id": 0}))
+        if not data:
+            st.error("No data found in MongoDB collection")
+            return pd.DataFrame()
+        
+        df = pd.DataFrame(data)
+        st.write(f"✅ Data Loaded: {len(df)} records")
+        return df
+    except Exception as e:
+        st.error(f"❌ MongoDB Error: {str(e)}")
+        return pd.DataFrame()
 
-print("Data Loaded Successfully")
-print("Total Rows:", len(df))
+# Load data
+df = load_data()
+
+# Handle empty dataframe
+if df.empty:
+    st.warning("Database is empty or connection failed")
+
 
 # ----------------------------
 # Parse Purchase History
