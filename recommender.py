@@ -3,12 +3,6 @@ import pandas as pd
 import ast
 import re
 from collections import Counter
-
-from config import get_database
-import pandas as pd
-import ast
-import re
-from collections import Counter
 import streamlit as st
 
 # Connect to MongoDB Atlas with error handling
